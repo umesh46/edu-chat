@@ -114,3 +114,51 @@ def download_pdf(pdf_url, output_folder="downloaded_pdfs"):
         print(f"[!] Error downloading {pdf_url}: {e}")
     except IOError as e:
         print(f"[!] Error saving file {filename}: {e}")
+
+# --- Main execution block ---
+
+if __name__ == "__main__":
+
+
+  TARGET_URL = "https://www.k5learning.com/free-math-worksheets/fifth-grade-5"
+  link_contains = "https://www.k5learning.com/free-math-worksheets/fifth-grade-5/"
+  g_drive_link = "/content/drive/MyDrive/Jiya/DoTheMath"
+
+  parent_f = urlparse(TARGET_URL).path.strip('/').split('/')[-1]
+
+  all_links = fetch_and_scrape_links(TARGET_URL)
+  # prompt: select links from all_links if it contains "free-math-worksheets/fifth-grade-5"
+
+  fifth_grade_links = [link for link in all_links if link_contains in link]
+
+  fifth_grade_links = fifth_grade_links
+
+  if fifth_grade_links:
+      print(f"\n[+] Found {len(fifth_grade_links)} unique links on the page:")
+      for i, link in enumerate(fifth_grade_links, 1):
+          print(f"  {i:3}. {link}")
+          clink_contains =  link +"/"
+          # print(clink_contains)
+          child_links = fetch_and_scrape_links(link)
+          child_links = [link for link in child_links if clink_contains in link]
+
+          child_links = child_links
+
+          for j, clink in enumerate(child_links, 1):
+            print(f"---------------  {j:3}. {clink}")
+
+            child_f = urlparse(clink).path.strip('/').split('/')[-1]
+
+            print("folder location: ----- ",parent_f+"/"+child_f)
+            save_folder = g_drive_link+"/"+parent_f+"/"+child_f
+
+            pdf_links = get_pdf_links(clink)
+            for k, pd_link in enumerate(pdf_links, 1):
+
+              print(f"---------------****************  {k:3}. {pd_link}")
+              download_pdf(pd_link,save_folder)
+            
+
+  else:
+      print("\n[-] No links were found or the page could not be accessed.")
+
